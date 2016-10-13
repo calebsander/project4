@@ -9,7 +9,7 @@
 // (Only try these if they sound interesting to you.)
 //   - Instead of moving in 16-pixel increments, move in 5-pixel increments.
 //   - Instead of moving whenever a key is pressed and released,
-//       move gradually while a key is pressed down.
+//       move gradually while a key is pressed down. <-- doing this one
 
 
 // Put your code here.
@@ -24,46 +24,76 @@ D=A
 M=D //ROW_WIDTH = 32
 @x
 M=-1 //x = -1
-@last_key
-M=0 //last_key = 0
+@counter
+M=0 //counter = 0
 
 (LOOP)
 	@KBD
 	D=M //D = KBD
-	@last_key
-	D=D-M //D = KBD - last_key
-	@LOOP
-	D;JEQ //continue if KBD == last_key
+	@RESET_COUNTER
+	D;JEQ //reset counter if KBD == 0
+		@counter
+		MD=M+1 //counter++
+		@32767
+		D=D-A //D = counter - 32767
+		@LOOP
+		D;JNE //continue if counter != 32767
 
-	@last_key
-	MD=D+M //last_key = KBD
-	@LOOP
-	D;JEQ //continue if KBD == 0
+		@x
+		MD=M+1 //x++
+		@SKIP_CLEAR
+		D;JEQ //don't clear previous square if creating the first one
+			@row
+			M=0 //row = 0
+			@SCREEN
+			D=A //D = &SCREEN
+			@x
+			D=D+M //D = &SCREEN + x
+			D=D-1 //D = &SCREEN + x - 1
+			@write_position
+			M=D //write_position = &SCREEN + x - 1
+			(CLEAR_LOOP)
+				@row
+				D=M //D = row
+				@HEIGHT
+				D=D-M //D = row - HEIGHT
+				@SKIP_CLEAR
+				D;JEQ //break if row == height
 
-	@x
-	MD=M+1 //x++
-	@SKIP_CLEAR
-	D;JEQ //don't clear previous square if creating the first one
+				@write_position
+				A=M //A = write_position
+				M=0 //*write_position = 0
+
+				@row
+				M=M+1 //row++
+				@write_position
+				D=M //D = write_position
+				@ROW_WIDTH
+				D=D+M //D = write_position + ROW_WIDTH
+				@write_position
+				M=D //write_position += ROW_WIDTH
+				@CLEAR_LOOP
+				0;JMP
+		(SKIP_CLEAR)
 		@row
 		M=0 //row = 0
 		@SCREEN
 		D=A //D = &SCREEN
 		@x
 		D=D+M //D = &SCREEN + x
-		D=D-1 //D = &SCREEN + x - 1
 		@write_position
-		M=D //write_position = &SCREEN + x - 1
-		(CLEAR_LOOP)
+		M=D //write_position = &SCREEN + x
+		(ROW_LOOP)
 			@row
 			D=M //D = row
 			@HEIGHT
 			D=D-M //D = row - HEIGHT
-			@SKIP_CLEAR
+			@RESET_COUNTER
 			D;JEQ //break if row == height
 
 			@write_position
 			A=M //A = write_position
-			M=0 //*write_position = 0
+			M=-1 //*write_position = -1
 
 			@row
 			M=M+1 //row++
@@ -73,39 +103,10 @@ M=0 //last_key = 0
 			D=D+M //D = write_position + ROW_WIDTH
 			@write_position
 			M=D //write_position += ROW_WIDTH
-			@CLEAR_LOOP
+			@ROW_LOOP
 			0;JMP
-	(SKIP_CLEAR)
-	@row
-	M=0 //row = 0
-	@SCREEN
-	D=A //D = &SCREEN
-	@x
-	D=D+M //D = &SCREEN + x
-	@write_position
-	M=D //write_position = &SCREEN + x
-	(ROW_LOOP)
-		@row
-		D=M //D = row
-		@HEIGHT
-		D=D-M //D = row - HEIGHT
+	(RESET_COUNTER)
+		@counter
+		M=0 //counter = 0
 		@LOOP
-		D;JEQ //break if row == height
-
-		@write_position
-		A=M //A = write_position
-		M=-1 //*write_position = -1
-
-		@row
-		M=M+1 //row++
-		@write_position
-		D=M //D = write_position
-		@ROW_WIDTH
-		D=D+M //D = write_position + ROW_WIDTH
-		@write_position
-		M=D //write_position += ROW_WIDTH
-		@ROW_LOOP
 		0;JMP
-
-	@LOOP
-	0;JMP
