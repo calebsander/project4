@@ -25,7 +25,7 @@ M=D //ROW_WIDTH = 32
 @x
 M=-1 //x = -1
 @counter
-M=0 //counter = 0
+M=1 //counter = 1
 
 (LOOP)
 	@KBD
@@ -34,10 +34,8 @@ M=0 //counter = 0
 	D;JEQ //reset counter if KBD == 0
 		@counter
 		MD=M+1 //counter++
-		@32767
-		D=D-A //D = counter - 32767
 		@LOOP
-		D;JNE //continue if counter != 32767
+		D;JNE //continue if counter hasn't overflowed to 0 yet
 
 		@x
 		MD=M+1 //x++
@@ -107,6 +105,6 @@ M=0 //counter = 0
 			0;JMP
 	(RESET_COUNTER)
 		@counter
-		M=0 //counter = 0
+		M=1 //counter = 1
 		@LOOP
 		0;JMP
