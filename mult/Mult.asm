@@ -12,7 +12,7 @@ M=0 //R2 = 0
 @bit
 M=0 //bit = 0
 @bitmask
-M=1 //bitmask = 1
+M=1 //bitmask = 1 << 0
 @R1
 D=M //D = R1
 @shifted_for_add
@@ -21,10 +21,10 @@ M=D //shifted_for_add = R1
 (LOOP_BIT)
 	@bit
 	D=M
-	@15
+	@16
 	D=D-A
 	@LOOP_BIT_END
-	D;JGT //LOOP_BIT_END if bit > 15
+	D;JGE //LOOP_BIT_END if bit >= 16
 
 	@bitmask
 	D=M //D = bitmask
@@ -34,13 +34,13 @@ M=D //shifted_for_add = R1
 	@ITERATE
 	D;JEQ //skip adding if bit is 0
 
-	//Add (R1 << bit) to the sum
-	@R2
-	D=M //D = R2
-	@shifted_for_add
-	D=D+M //D = R2 + shifted_for_add
-	@R2
-	M=D //R2 += shifted_for_add
+		//Add (R1 << bit) to the sum
+		@R2
+		D=M //D = R2
+		@shifted_for_add
+		D=D+M //D = R2 + shifted_for_add
+		@R2
+		M=D //R2 += shifted_for_add
 
 	(ITERATE)
 	@bit
