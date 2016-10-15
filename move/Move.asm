@@ -38,18 +38,17 @@ M=1 //counter = 1
 		D;JNE //continue if counter hasn't overflowed to 0 yet
 
 		@x
-		MD=M+1 //x++
+		D=M //D = x
 		@SKIP_CLEAR
-		D;JEQ //don't clear previous square if creating the first one
+		D;JLT //don't clear previous square if creating the first one
 			@row
 			M=0 //row = 0
 			@SCREEN
 			D=A //D = &SCREEN
 			@x
 			D=D+M //D = &SCREEN + x
-			D=D-1 //D = &SCREEN + x - 1
 			@write_position
-			M=D //write_position = &SCREEN + x - 1
+			M=D //write_position = &SCREEN + x
 			(CLEAR_LOOP)
 				@row
 				D=M //D = row
@@ -73,6 +72,8 @@ M=1 //counter = 1
 				@CLEAR_LOOP
 				0;JMP
 		(SKIP_CLEAR)
+		@x
+		M=M+1 //x++
 		@row
 		M=0 //row = 0
 		@SCREEN
